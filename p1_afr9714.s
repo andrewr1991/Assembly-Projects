@@ -23,7 +23,7 @@ main:
     
     //Conditionals
     MOV R1, R2
-    BL _compareA
+    BL _compare
     
     B   _exit               @ branch to exit procedure with no return
    
@@ -73,11 +73,23 @@ _getchar:
     AND R0, #0xFF           @ mask out all but the lowest 8 bits
     MOV PC, LR              @ return
     
-_compareA:
+_compare:
+
+	//Add
     CMP R7, #'+'            @ compare against the constant char '+'
     BEQ _add				@ branch to add handler
+    
+    //Subtract
     CMP R7, #'-'
     BEQ _subtract
+    
+    //Multiply
+    CMP R7, #'*'
+    BEQ _multiply
+    
+    //Max
+    CMP R7, #'M'
+    BEQ _max
     
     
 _add:
@@ -93,10 +105,37 @@ _subtract:
 	SUB R1, R6, R4
     BL printf               @ call printf
     MOV PC, R5              @ return
+    
+_multiply:
+	MOV R5, LR              @ store LR since printf call overwrites
+    LDR R0, =printf_str     @ R0 contains formatted string address
+    MUL R1, R6, R4          @ compute R1 = R6 * R4
+    BL printf               @ call printf
+    MOV PC, R5              @ return
+    
+_max:
+	CMP R6, R4
+	BGT _printf_max1
+	BLT _printf_max2
+    
+_printf_max1:
+	MOV R5, LR              @ store LR since printf call overwrites
+    LDR R0, =printf_max     @ R0 contains formatted string address
+    MOV R1, R6          
+    BL printf               @ call printf
+    MOV PC, R5              @ return
+        
+_printf_max2:
+	MOV R5, LR              @ store LR since printf call overwrites
+    LDR R0, =printf_max     @ R0 contains formatted string address
+    MOV R1, R4          
+    BL printf               @ call printf
+    MOV PC, R5              @ return
 
 .data
 format_str1:    .asciz      "%d"
 format_str2:    .asciz      "%d"
 printf_str:     .asciz      "The sum is: %d\n"
+printf_max:     .asciz      "The max is: %d\n"
 exit_str:       .ascii      "Terminating program.\n"
 read_char:      .ascii      " "
