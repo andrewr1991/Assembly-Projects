@@ -15,12 +15,14 @@ main:
     
     //Operator
     BL _getchar
-    MOV R1, R0
+    MOV R7, R0
     
     //Second scanf
     BL  _scanf2             @ branch to scanf procedure with return
     MOV R4, R0              @ move return value R0 to argument register R1
     
+    //Conditionals
+    MOV R1, R2
     BL _compareA
     
     B   _exit               @ branch to exit procedure with no return
@@ -72,25 +74,25 @@ _getchar:
     MOV PC, LR              @ return
     
 _compareA:
-    CMP R1, #'+'            @ compare against the constant char '@'
+    CMP R7, #'+'            @ compare against the constant char '+'
     BEQ _add				@ branch to add handler
+    CMP R7, #'-'
+    BEQ _subtract
     
-_comparS:
-    CMP R1, #'-'            @ compare against the constant char '@'
-    
-_comparM:
-    CMP R1, #'*'            @ compare against the constant char '@'
-    
-_compareMax:
-    CMP R1, #'M'            @ compare against the constant char '@'
     
 _add:
 	MOV R5, LR              @ store LR since printf call overwrites
     LDR R0, =printf_str     @ R0 contains formatted string address
-	ADD R1, R4, R6
+	ADD R1, R6, R4
     BL printf               @ call printf
     MOV PC, R5              @ return
-	
+    
+_subtract:
+	MOV R5, LR              @ store LR since printf call overwrites
+    LDR R0, =printf_str     @ R0 contains formatted string address
+	SUB R1, R6, R4
+    BL printf               @ call printf
+    MOV PC, R5              @ return
 
 .data
 format_str1:    .asciz      "%d"
