@@ -1,6 +1,6 @@
 /******************************************************************************
 * @file p1_afr9714.s
-* @Simple calculator program that can add, subtract, multiply, or find the max of two positive ints
+* @Simple calculator program that can add, subtract, multiply, or find the max of, two positive ints
 * @author Andrew Ridout
 * @original code by Christopher D. McMurrough
 ******************************************************************************/
@@ -9,6 +9,7 @@
 .func main
    
 main:
+loop:
 	//First scanf
     BL  _scanf1             @ branch to scanf procedure with return
     MOV R6, R0              @ move return value R0 to argument register R1
@@ -22,8 +23,10 @@ main:
     MOV R4, R0              @ move return value R0 to argument register R1
     
     //Conditionals
-    MOV R1, R2
+    //MOV R1, R2
     BL _compare
+    
+    B loop
     
     B   _exit               @ branch to exit procedure with no return
    
@@ -90,7 +93,6 @@ _compare:
     //Max
     CMP R7, #'M'
     BEQ _max
-    
     
 _add:
 	MOV R5, LR              @ store LR since printf call overwrites
