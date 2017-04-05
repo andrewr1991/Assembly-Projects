@@ -1,6 +1,6 @@
 /******************************************************************************
 * @file p1_afr9714.s
-* @Simple calculator program that can add, subtract, multiply, or find the max of, two positive ints
+* @Simple calculator program that can add, subtract, multiply, or find the max of two positive ints
 * @author Andrew Ridout
 * @original code by Christopher D. McMurrough
 ******************************************************************************/
@@ -10,23 +10,22 @@
    
 main:
 loop:
-	//First scanf
+    //First scanf
     BL  _scanf1             @ branch to scanf procedure with return
     MOV R6, R0              @ move return value R0 to argument register R1
     
     //Operator
-    BL _getchar
-    MOV R7, R0
+    BL _getchar             @ branch to _getchar handler
+    MOV R7, R0              @ put R0 into R7
     
     //Second scanf
     BL  _scanf2             @ branch to scanf procedure with return
     MOV R4, R0              @ move return value R0 to argument register R1
     
     //Conditionals
-    //MOV R1, R2
-    BL _compare
+    BL _compare             @ branch to procedure that compares
     
-    B loop
+    B loop                  @ branch back to beginning of loop
     
     B   _exit               @ branch to exit procedure with no return
    
@@ -78,58 +77,58 @@ _getchar:
     
 _compare:
 
-	//Add
+    //Add
     CMP R7, #'+'            @ compare against the constant char '+'
-    BEQ _add				@ branch to add handler
+    BEQ _add		    @ branch to add procedure
     
     //Subtract
-    CMP R7, #'-'
-    BEQ _subtract
+    CMP R7, #'-'            @ compare against the constant char '-'
+    BEQ _subtract	    @ branch to subtract procedure
     
     //Multiply
-    CMP R7, #'*'
-    BEQ _multiply
+    CMP R7, #'*'            @ compare against the constant char '*'
+    BEQ _multiply	    @ branch to multiply procedure
     
     //Max
-    CMP R7, #'M'
-    BEQ _max
+    CMP R7, #'M'            @ compare against the constant char 'M'
+    BEQ _max		    @ branch to max procedure
     
 _add:
-	MOV R5, LR              @ store LR since printf call overwrites
+    MOV R5, LR              @ store LR since printf call overwrites
     LDR R0, =printf_str     @ R0 contains formatted string address
-	ADD R1, R6, R4
+    ADD R1, R6, R4
     BL printf               @ call printf
     MOV PC, R5              @ return
     
 _subtract:
-	MOV R5, LR              @ store LR since printf call overwrites
+    MOV R5, LR              @ store LR since printf call overwrites
     LDR R0, =printf_str     @ R0 contains formatted string address
-	SUB R1, R6, R4
+    SUB R1, R6, R4
     BL printf               @ call printf
     MOV PC, R5              @ return
     
 _multiply:
-	MOV R5, LR              @ store LR since printf call overwrites
+    MOV R5, LR              @ store LR since printf call overwrites
     LDR R0, =printf_str     @ R0 contains formatted string address
     MUL R1, R6, R4          @ compute R1 = R6 * R4
     BL printf               @ call printf
     MOV PC, R5              @ return
     
 _max:
-	CMP R6, R4
-	BGT _printf_max1
-	BLT _printf_max2
+    CMP R6, R4              @ compare the two ints from the user
+    BGT _printf_max1        @ if greater than, branch to printf_max1 procedure
+    BLT _printf_max2        @ if less than, branch to printf_max2 procedure
     
 _printf_max1:
-	MOV R5, LR              @ store LR since printf call overwrites
-    LDR R0, =printf_max     @ R0 contains formatted string address
+    MOV R5, LR              @ store LR since printf call overwrites
+    LDR R0, =printf_str     @ R0 contains formatted string address
     MOV R1, R6          
     BL printf               @ call printf
     MOV PC, R5              @ return
         
 _printf_max2:
-	MOV R5, LR              @ store LR since printf call overwrites
-    LDR R0, =printf_max     @ R0 contains formatted string address
+    MOV R5, LR              @ store LR since printf call overwrites
+    LDR R0, =printf_str     @ R0 contains formatted string address
     MOV R1, R4          
     BL printf               @ call printf
     MOV PC, R5              @ return
@@ -137,7 +136,6 @@ _printf_max2:
 .data
 format_str1:    .asciz      "%d"
 format_str2:    .asciz      "%d"
-printf_str:     .asciz      "The sum is: %d\n"
-printf_max:     .asciz      "The max is: %d\n"
+printf_str:     .asciz      "%d\n"
 exit_str:       .ascii      "Terminating program.\n"
 read_char:      .ascii      " "
