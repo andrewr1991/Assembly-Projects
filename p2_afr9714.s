@@ -1,6 +1,8 @@
 /******************************************************************************
-* @file rand_array.s
-* @author Christopher D. McMurrough
+* @file p2_afr9714.s
+* @Simple program that finds the min and max values of an array with 10 randomly generated values between 0-999
+* @author Andrew Ridout
+* @original code by Christopher D. McMurrough
 ******************************************************************************/
  
 .global main
@@ -18,10 +20,13 @@ writeloop:
     PUSH {R0}               @ backup iterator before procedure call
     PUSH {R2}               @ backup element address before procedure call
     BL _getrand             @ get a random number
-    POP {R2}                @ restore element address
-    STR R0, [R2]            @ write the address of a[i] to a[i]
+    MOV R1, R0
+    MOV R2, #1000
+    BL  _mod_unsigned
     MOV R4, R0
     MOV R5, R0
+    POP {R2}                @ restore element address
+    STR R0, [R2]            @ write the address of a[i] to a[i]
     POP {R0}                @ restore iterator
     ADD R0, R0, #1          @ increment index
     B   writeloop           @ branch to next loop iteration
@@ -53,6 +58,22 @@ readdone:
 	BL _min
 	BL _max
     B _exit                 @ exit if done
+    
+_mod_unsigned:
+    cmp R2, R1          @ check to see if R1 >= R2
+    MOVHS R0, R1        @ swap R1 and R2 if R2 > R1
+    MOVHS R1, R2        @ swap R1 and R2 if R2 > R1
+    MOVHS R2, R0        @ swap R1 and R2 if R2 > R1
+    MOV R0, #0          @ initialize return value
+    B _modloopcheck     @ check to see if
+    _modloop:
+        ADD R0, R0, #1  @ increment R0
+        SUB R1, R1, R2  @ subtract R2 from R1
+    _modloopcheck:
+        CMP R1, R2      @ check for loop termination
+        BHS _modloop    @ continue loop if R1 >= R2
+    MOV R0, R1          @ move remainder to R0
+    MOV PC, LR          @ return
     
 _exit:  
     MOV R7, #4              @ write syscall, 4
@@ -95,12 +116,11 @@ _max:
 	MOV R1, R4
 	BL printf
 	POP {PC}
-	
    
 .data
 
 .balign 4
-a:              .skip       400
+a:              .skip       40
 printf_str:     .asciz      "a[%d] = %d\n"
 printf_min:     .asciz      "MINIMUM VALUE = %d\n"
 printf_max:     .asciz      "MAXIMUM VALUE = %d\n"
