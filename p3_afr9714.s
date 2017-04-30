@@ -1,0 +1,57 @@
+/******************************************************************************
+* @file p3_afr9714
+* @Partitions algorithm program
+*
+* @author Christopher D. McMurrough
+* @modified by Andrew Ridout
+******************************************************************************/
+ 
+.global main
+.func main
+   
+main:
+    BL  _scanf              @ branch to scanf procedure with return
+    PUSH {R0}
+    BL _scanf
+    POP {R1}
+    MOV R2, R0
+    LDR R0, =printf_str     @ R0 contains formatted string address
+    BL printf               @ call printf
+    B   _exit               @ branch to exit procedure with no return
+    
+num_partitions:
+	PUSH {LR}
+	CMP R1, #0
+	MOVEQ R1, #1
+	POPEQ {PC}
+	CMP R1, #0
+	MOVLT R1, #0
+	POPLT {PC}
+	CMP R2, #0
+	MOVEQ R2, #0
+	POPEQ {PC}
+	
+	
+	
+    
+_scanf:
+    PUSH {LR}               @ store LR since scanf call overwrites
+    SUB SP, SP, #4          @ make room on stack
+    LDR R0, =format_str     @ R0 contains address of format string
+    MOV R1, SP              @ move SP to R1 to store entry on stack
+    BL scanf                @ call scanf
+    LDR R0, [SP]            @ load value at SP into R0
+    ADD SP, SP, #4          @ restore the stack pointer
+    POP {PC}                @ return
+    
+_exit:  
+    MOV R7, #4              @ write syscall, 4
+    MOV R0, #1              @ output stream to monitor, 1
+    MOV R2, #21             @ print string length
+    SWI 0                   @ execute syscall
+    MOV R7, #1              @ terminate syscall, 1
+    SWI 0                   @ execute syscall
+
+.data
+format_str:     .asciz      "%d"
+printf_str:     .asciz      "The numbers entered were: %d %d\n"
