@@ -15,6 +15,8 @@ main:
     BL _scanf
     POP {R1}
     MOV R2, R0
+    BL num_partitions
+    MOV R1, R0
     LDR R0, =printf_str     @ R0 contains formatted string address
     BL printf               @ call printf
     B   _exit               @ branch to exit procedure with no return
@@ -44,11 +46,6 @@ num_partitions:
 	ADD R0, R0, R3
 	POP {PC}
 	
-	
-	
-	
-	
-    
 _scanf:
     PUSH {LR}               @ store LR since scanf call overwrites
     SUB SP, SP, #4          @ make room on stack
