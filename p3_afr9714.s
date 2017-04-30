@@ -22,14 +22,29 @@ main:
 num_partitions:
 	PUSH {LR}
 	CMP R1, #0
-	MOVEQ R1, #1
+	MOVEQ R0, #1
 	POPEQ {PC}
 	CMP R1, #0
-	MOVLT R1, #0
+	MOVLT R0, #0
 	POPLT {PC}
 	CMP R2, #0
-	MOVEQ R2, #0
+	MOVEQ R0, #0
 	POPEQ {PC}
+	
+	PUSH {R1}
+	PUSH {R2}
+	SUB R2, R2, #1
+	BL num_partitions
+	POP {R2}
+	POP {R1}
+	PUSH {R0}				@value returned from BL num_partitions
+	SUB R1, R1, R2
+	BL num_partitions
+	POP {R3}
+	ADD R0, R0, R3
+	POP {PC}
+	
+	
 	
 	
 	
