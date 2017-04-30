@@ -15,8 +15,12 @@ main:
     BL _scanf
     POP {R1}
     MOV R2, R0
+    MOV R4, R1
+    MOV R5, R2
     BL num_partitions
     MOV R1, R0
+    MOV R2, R4
+    MOV R3, R5
     LDR R0, =printf_str     @ R0 contains formatted string address
     BL printf               @ call printf
     B   _exit               @ branch to exit procedure with no return
@@ -32,7 +36,7 @@ num_partitions:
 	CMP R2, #0
 	MOVEQ R0, #0
 	POPEQ {PC}
-	
+
 	PUSH {R1}
 	PUSH {R2}
 	SUB R2, R2, #1
@@ -66,4 +70,4 @@ _exit:
 
 .data
 format_str:     .asciz      "%d"
-printf_str:     .asciz      "The numbers entered were: %d %d\n"
+printf_str:     .asciz      "There are %d partitions of %d using integers up to %d\n"
