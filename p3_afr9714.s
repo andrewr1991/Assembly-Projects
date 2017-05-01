@@ -10,6 +10,7 @@
 .func main
    
 main:
+	loop:
     BL  _scanf              @ branch to scanf procedure with return
     PUSH {R0}
     BL _scanf
@@ -23,6 +24,7 @@ main:
     MOV R3, R5
     LDR R0, =printf_str     @ R0 contains formatted string address
     BL printf               @ call printf
+    BL loop
     B   _exit               @ branch to exit procedure with no return
     
 num_partitions:
