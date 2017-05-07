@@ -83,11 +83,11 @@ search:
     B   search            @ branch to next loop iteration
     
 _exit:
-	CMP R4, #0
-	BLEQ _printf_notfound
     MOV R7, #4              @ write syscall, 4
     MOV R0, #1              @ output stream to monitor, 1
     MOV R2, #21             @ print string length
+    CMP R4, #0
+	BLEQ _printf_notfound
     SWI 0                   @ execute syscall
     MOV R7, #1              @ terminate syscall, 1
     SWI 0                   @ execute syscall
