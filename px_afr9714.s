@@ -57,10 +57,11 @@ user_input:
 	MOV R3, R0
 	POP {R1}
 	MOV R0, #0              @ initialze index variable
+	MOV R4, #0
 	
 search:
     CMP R0, #10             @ check to see if we are done iterating
-    BEQ exit            @ exit loop if done
+    BEQ _exit            @ exit loop if done
     PUSH {R3}
     LDR R1, =a              @ get address of a
     LSL R2, R0, #2          @ multiply index*4 to get array offset
@@ -70,6 +71,7 @@ search:
     PUSH {R1}               @ backup register before printf
     PUSH {R2}               @ backup register before printf
     CMP R3, R1
+    ADDEQ R4, #1
     MOVEQ R2, R1              @ move array value to R2 for printf
     MOVEQ R1, R0              @ move array index to R1 for printf
     BLEQ _printf             @ branch to print procedure with return
@@ -80,12 +82,12 @@ search:
     POP {R3}
     B   search            @ branch to next loop iteration
     
-_exit:  
-	BL printf
+_exit:
+	CMP R4, #0
+	BLEQ _printf_notfound
     MOV R7, #4              @ write syscall, 4
     MOV R0, #1              @ output stream to monitor, 1
     MOV R2, #21             @ print string length
-    LDR R1, =exit_str       @ string at label exit_str:
     SWI 0                   @ execute syscall
     MOV R7, #1              @ terminate syscall, 1
     SWI 0                   @ execute syscall
@@ -108,9 +110,15 @@ _printf:
     
 _printf_search:
     PUSH {LR}               @ store the return address
-    LDR R0, = search_str     @ R0 contains formatted string address
+    LDR R0, =search_str     @ R0 contains formatted string address
     BL printf               @ call printf
     POP {PC}                @ restore the stack pointer and return
+    
+_printf_notfound:
+	PUSH {LR}
+	LDR R0, =notfound_str
+	BL printf
+	POP {PC}
    
 .data
 
@@ -118,7 +126,7 @@ _printf_search:
 a:              .skip       40
 printf_str:     .asciz      "array_a[%d] = %d\n"
 search_str:     .asciz      "ENTER A SEARCH VALUE: "
+notfound_str:   .ascii      "That value does not exist in the array!\n"
 format_str:    .asciz       "%d"
 debug_str:
 .asciz "R%-2d   0x%08X  %011d \n"
-exit_str:       .ascii      "Terminating program.\n"
